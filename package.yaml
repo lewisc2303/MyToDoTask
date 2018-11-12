@@ -38,7 +38,7 @@ executables:
 
 tests:
   MyToDoTask-test:
-    main:                Spec.hs
+    main:                MainSpec.hs
     source-dirs:         test
     ghc-options:
     - -threaded

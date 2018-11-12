@@ -1,6 +1,20 @@
-module Lib
-    ( someFunc
-    ) where
+module Lib (main, test) where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+--import Data.Dates
+
+main :: IO()
+main = putStrLn test
+
+test :: String
+test = "test"
+
+--type Name =
+    String
+
+-- type DateAdded = 
+
+
+-- type TaskDeadLine
+
+-- data TodoItem =
+--     TodoItem Name DateAdded TaskDeadline 
