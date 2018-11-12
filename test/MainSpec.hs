@@ -4,12 +4,7 @@ import Lib (main, test)
 import Test.Hspec
 
 main :: IO ()
-main = hpsec $ do
-    describe "main" $ do
+main = hspec $ do
+    describe "Test for test environment" $ do
         it "should return 'test'" $ do
             main `shouldBe` ("test")
-
-
-
-
-
