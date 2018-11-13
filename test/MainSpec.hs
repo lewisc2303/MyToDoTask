@@ -7,4 +7,4 @@ main :: IO ()
 main = hspec $ do
     describe "Test for test environment" $ do
         it "should return 'test'" $ do
-            main `shouldBe` ("test")
+            Lib.main `shouldBe` (3)
