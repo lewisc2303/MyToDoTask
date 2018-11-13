@@ -1,10 +1,10 @@
 module MainSpec where
 
-import Lib (main, test)
+import Main 
 import Test.Hspec
 
 main :: IO ()
 main = hspec $ do
-    describe "Test for test environment" $ do
-        it "should return 'test'" $ do
-            Lib.main `shouldBe` (3)
+    describe "test the creation of task deadline creation" $ do
+        it "should return Taskdeadline type" $ do
+            Main.createTaskDeadLine "23" "10" "2018" `shouldBe` (TaskDeadLine ("23", "10", "2018"))
