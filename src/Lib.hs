@@ -2,6 +2,7 @@ module Lib where
 
 import System.Exit (exitSuccess)
 import Control.Monad (forever)   
+import Data.Maybe (isJust)
 
 data DateAdded = 
         DateAdded ([Char], [Char], [Char])
@@ -24,49 +25,41 @@ instance Show ToDoItem where
                 ++ "\n" ++ "Description:"
                 ++ "\n" ++ description
                 
-data ToDoList a =
-        None 
-        | Node (ToDoList a) a (ToDoList a)
-
---if i use show a in function below then the instance of show ToDoItem isnot used???
-instance Show a => Show (ToDoList a) where
-    show None = " "
-    show (Node (left) a (right)) =
-        left ++
-        "\n" ++ a ++
-        "\n" ++ right
-
 --test item
-toDoList1 :: ToDoList ToDoItem        
-toDoList1 = Node (Node None (ToDoItem "name" (DateAdded ("d","m","y")) (TaskDeadLine ("d1", "m1", "y1")) "description") None) (ToDoItem "name" (DateAdded ("d","m","y")) (TaskDeadLine ("d1", "m1", "y1")) "description") None
+-- toDoList1 :: ToDoList ToDoItem        
+-- toDoList1 = Node (Node None (ToDoItem "name" (DateAdded ("d","m","y")) (TaskDeadLine ("d1", "m1", "y1")) "description") None) (ToDoItem "name" (DateAdded ("d","m","y")) (TaskDeadLine ("d1", "m1", "y1")) "description") None
 
---add ordering at a later date, left or right dependant on the orderig of deadline
--- todo doesent work because of ScopedTypeVariables
-createList :: ToDoList ToDoItem -> ToDoItem -> ToDoList ToDoItem
-createList None (todo ::ToDoItem) = Node None todo None
-createList (Node left a right) (todo :: ToDoItem) = Node a left (createList right todo)
+-- createList :: ToDoItem -> [ToDoItem]
+-- createList toDoItem = [] ++ [toDoItem]
 
-createToDo :: TaskDeadLine -> String  -> String -> ToDoItem
+-- addToList :: ToDoItem -> [Maybe ToDoItem] -> IO [Maybe ToDoItem]
+-- addToList toDoItem list = (Just toDoItem) : list
+
+createToDo :: TaskDeadLine -> String -> String -> ToDoItem
 createToDo deadline item description = ToDoItem item (DateAdded ("13", "11", "2018")) deadline description
 
-createTaskDeadLine :: String -> String -> String -> TaskDeadLine
+createTaskDeadLine :: [Char] -> [Char] -> [Char] -> TaskDeadLine
 createTaskDeadLine day month year = TaskDeadLine (day, month, year)
+
+takeDay :: String -> String
+takeDay date = (take 2 date)
+
+takeMonth :: String -> String
+takeMonth date =  (take 2 (drop 3 date))
+
+takeYear :: String -> String
+takeYear date = (take 4 (drop 6 date))
 
 addItem :: IO()
 addItem = do
         putStrLn "What is the name of the item?"
         item <- getLine
-        putStrLn "When is the deadline for this task..."
-        putStrLn "day?"
-        day <- getLine
-        putStrLn "month?"
-        month <- getLine
-        putStrLn "year?"
-        year <- getLine
+        putStrLn "When is the deadline for this task?"
+        date <- getLine
         putStrLn "Write a description for this task:"
         description <- getLine
-        let todo1 = createToDo (createTaskDeadLine day month year) item description
-        exitSuccess
+        let todo = createToDo (createTaskDeadLine (takeDay date) (takeMonth date) (takeYear date)) item description
+        print todo
 
 deleteItem = undefined
 
