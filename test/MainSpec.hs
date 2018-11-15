@@ -14,8 +14,14 @@ spec = do
             Lib.createToDo (TaskDeadLine ("23", "10", "2018")) "item" "description" `shouldBe` 
                 (ToDoItem "item" (DateAdded ("13", "11", "2018")) (TaskDeadLine ("23", "10", "2018")) "description")
     
-    describe "createList" $ do
-        it "should create a list of 10, filled with Nothing type" $ do
-            Lib.createList `shouldBe` ([Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing])
+    describe "TakeDay" $ do
+        it "should return the first 2 charecters of date string" $ do
+            Lib.takeDay "23/03/1995" `shouldBe` ("23")
     
+    describe "TakeMonth" $ do
+        it "should return the 4th adn 5th charecters of date string" $ do
+            Lib.takeMonth "23/03/1995" `shouldBe` ("03")
     
+    describe "TakeYear" $ do
+        it "should return the 7th, 8th, 9th, 10th charecters of date string" $ do
+            Lib.takeYear "23/03/1995" `shouldBe` ("1995")

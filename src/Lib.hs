@@ -18,14 +18,9 @@ data ToDoItem =
     
 instance Show ToDoItem where 
         show (ToDoItem name (DateAdded (d,m,y)) (TaskDeadLine (d1, m1, y1)) description) = 
-                "\n" ++
-                "Todo Item: " ++ name 
-                ++ "\n" ++ "------------------------------------------------"
-                ++ "\n" ++ "Created on the " ++ (d ++ "/" ++ m ++ "/" ++ y) ++ " Due by the " ++ (d1 ++ "/" ++ m1 ++ "/" ++ y1)
-                ++ "\n" ++ "Description:"
-                ++ "\n" ++ description
+                "Todo Item: " ++ name ++ "Created on the " ++ (d ++ "/" ++ m ++ "/" ++ y) ++ " Due by the " ++ (d1 ++ "/" ++ m1 ++ "/" ++ y1) 
+                        ++ "Description:" ++ description
 
-                
 --test item
 -- toDoList1 :: ToDoList ToDoItem        
 -- toDoList1 = Node (Node None (ToDoItem "name" (DateAdded ("d","m","y")) (TaskDeadLine ("d1", "m1", "y1")) "description") None) (ToDoItem "name" (DateAdded ("d","m","y")) (TaskDeadLine ("d1", "m1", "y1")) "description") None
@@ -65,8 +60,12 @@ addItem = do
 
 deleteItem = undefined
 
+readToDoList :: FilePath -> IO ToDoItem
+readToDoList = undefined 
+
 viewList :: IO()
 viewList = do
-        lists <- readFile "data/items.txt"
+        lists <- readToDoList "data/items.txt"
         exitSuccess
+
 
