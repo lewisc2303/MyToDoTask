@@ -24,6 +24,7 @@ instance Show ToDoItem where
                 ++ "\n" ++ "Created on the " ++ (d ++ "/" ++ m ++ "/" ++ y) ++ " Due by the " ++ (d1 ++ "/" ++ m1 ++ "/" ++ y1)
                 ++ "\n" ++ "Description:"
                 ++ "\n" ++ description
+
                 
 --test item
 -- toDoList1 :: ToDoList ToDoItem        
@@ -59,8 +60,13 @@ addItem = do
         putStrLn "Write a description for this task:"
         description <- getLine
         let todo = createToDo (createTaskDeadLine (takeDay date) (takeMonth date) (takeYear date)) item description
-        print todo
+        writeFile "data/items.txt" (show todo)
+        exitSuccess
 
 deleteItem = undefined
 
-viewList = undefined
+viewList :: IO()
+viewList = do
+        lists <- readFile "data/items.txt"
+        exitSuccess
+
