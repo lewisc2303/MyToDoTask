@@ -1,1 +1,1 @@
-Todo Item: dasCreated on the 13/11/2018 Due by the 23/03/1995Description:asdgffdg
+ToDoItem "shopping" (DateAdded (18,11,2018)) (TaskDeadLine ("23","03","1995")) "go christmas shopping"
