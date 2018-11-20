@@ -40,7 +40,6 @@ packages:
 # (e.g., acme-missiles-0.3)
 extra-deps: 
 - strict-0.3.2
-- serialize-0.5.7.0
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

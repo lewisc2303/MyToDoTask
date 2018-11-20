@@ -13,20 +13,18 @@ import Data.Aeson.Types
 import Data.Time.Clock
 import Data.Time.Calendar
 import qualified System.IO.Strict as SIO
-import Data.Serialize
 
 data DateAdded = 
         DateAdded (Int, Int, Integer)
-                deriving (Eq, Show)
+                deriving (Eq, Show, Generic)
     
 data TaskDeadLine =
         TaskDeadLine (Int, Int, Integer)
-                deriving (Eq, Show)
+                deriving (Eq, Show, Generic)
     
 data ToDoItem =
         ToDoItem [Char] (DateAdded) TaskDeadLine [Char]
-                deriving (Show)
-    
+                deriving (Show, Generic)
 
 currentDay :: IO (Integer,Int,Int) -- :: (year,month,day)
 currentDay = getCurrentTime >>= (return . toGregorian . utctDay)
@@ -86,4 +84,3 @@ viewList = do
         lists <- readFile "data/items.txt"
         print lists
         exitSuccess
-

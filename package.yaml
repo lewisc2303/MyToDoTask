@@ -24,7 +24,6 @@ dependencies:
 - aeson
 - time
 - strict
-- serialize
 
 library:
   source-dirs: src

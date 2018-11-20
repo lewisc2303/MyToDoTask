@@ -1,3 +1,4 @@
 ToDoItem "Shopping" (DateAdded (18,11,2018)) (TaskDeadLine (20,12,2018)) "Buy christmas presents for the family"
 ToDoItem "Shopping" (DateAdded (18,11,2018)) (TaskDeadLine (23,23,9845)) "fjkshfs"
 ToDoItem "blah blah" (DateAdded (18,11,2018)) (TaskDeadLine (45,23,9843)) "blah ble blah blah"
+ToDoItem "shopping again" (DateAdded (20,11,2018)) (TaskDeadLine (23,12,2018)) "shopping again la la la"
