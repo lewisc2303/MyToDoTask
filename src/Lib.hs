@@ -1,46 +1,40 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Lib where
 
 import System.Exit (exitSuccess)
 import Control.Monad (forever)   
-import Data.Maybe (isJust)
+import Data.Maybe 
 import GHC.Generics
 import Data.Aeson
 import Data.Aeson.Types
 import Data.Time.Clock
 import Data.Time.Calendar
-import qualified System.IO.Strict as SIO
+import qualified Data.ByteString.Lazy as B
 
-data DateAdded = 
-        DateAdded (Int, Int, Integer)
-                deriving (Eq, Show, Generic)
-    
-data TaskDeadLine =
-        TaskDeadLine (Int, Int, Integer)
-                deriving (Eq, Show, Generic)
-    
 data ToDoItem =
-        ToDoItem [Char] (DateAdded) TaskDeadLine [Char]
-                deriving (Show, Generic)
+        ToDoItem { title :: [Char]
+                ,dateAdded :: (Int, Int, Integer)
+                ,taskDeadLine :: (Int, Int, Integer)
+                ,description :: [Char]
+                } deriving (Show, Generic, FromJSON, ToJSON)
 
 currentDay :: IO (Integer,Int,Int) -- :: (year,month,day)
 currentDay = getCurrentTime >>= (return . toGregorian . utctDay)
 
-getCurrentDay :: IO DateAdded
+getCurrentDay :: IO (Int,Int,Integer)
 getCurrentDay = do
         (x,y,z) <- currentDay
-        return (DateAdded (z,y,x))
+        return (z,y,x)
 
-createToDo :: TaskDeadLine -> String -> String -> IO ToDoItem
+createToDo :: (Int, Int, Integer) -> String -> String -> IO ToDoItem
 createToDo deadline item description = do
         x <- getCurrentDay
         return $ ToDoItem item (x) deadline description
-
-createTaskDeadLine :: Int -> Int -> Integer -> TaskDeadLine
-createTaskDeadLine day month year = TaskDeadLine (day, month, year)
 
 takeDay :: String -> Int
 takeDay filteredDate = read (take 2 filteredDate) :: Int
@@ -51,11 +45,6 @@ takeMonth filteredDate = read (take 2 (drop 3 filteredDate)) :: Int
 takeYear :: String -> Integer
 takeYear filteredDate = read (take 4 (drop 6 filteredDate)) :: Integer
 
-concatListAndNewItem :: ToDoItem -> IO () 
-concatListAndNewItem toDoItem = do
-                        list <- SIO.readFile "data/items.txt"
-                        writeFile "data/items.txt" (list ++ "\n" ++ (show toDoItem))
-
 addItem :: IO()
 addItem = do
         putStrLn "What is the name of the item?"
@@ -63,8 +52,9 @@ addItem = do
         filteredDate <- addDate
         putStrLn "Write a description for this task:"
         description <- getLine
-        todo <- createToDo (createTaskDeadLine (takeDay filteredDate) (takeMonth filteredDate) (takeYear filteredDate)) item description
-        concatListAndNewItem todo
+        todo <- createToDo ((takeDay filteredDate), (takeMonth filteredDate), (takeYear filteredDate)) item description
+        jsonList <- getJSON
+        B.writeFile "data/items2.json" (encode (todo : fromJust jsonList))
         exitSuccess
 
 deleteItem = undefined
@@ -79,8 +69,16 @@ addDate = do
                         putStrLn "Your date must be in the form dd/mm/yyy"
                         addDate
 
-viewList :: IO ()
-viewList = do
-        lists <- readFile "data/items.txt"
-        print lists
-        exitSuccess
+viewList :: IO()
+viewList = do 
+        list <- getJSON
+        print list
+
+jsonFile :: FilePath
+jsonFile = "data/items.json"
+
+getJSON :: IO (Maybe [ToDoItem])
+getJSON = do
+        list <- decode <$> B.readFile jsonFile
+        return (list :: Maybe [ToDoItem])
+        
