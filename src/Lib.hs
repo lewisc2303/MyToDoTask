@@ -3,6 +3,7 @@
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Lib where
 
@@ -26,14 +27,14 @@ data ToDoItem =
 currentDay :: IO (Integer,Int,Int) -- :: (year,month,day)
 currentDay = getCurrentTime >>= (return . toGregorian . utctDay)
 
-getCurrentDay :: IO (Int,Int,Integer)
-getCurrentDay = do
-        (x,y,z) <- currentDay
-        return (z,y,x)
+reArrangedCurrentDay :: IO (Int,Int,Integer)
+reArrangedCurrentDay = do
+        (year,month,day) <- currentDay
+        return (day,month,year)
 
 createToDo :: (Int, Int, Integer) -> String -> String -> IO ToDoItem
 createToDo deadline item description = do
-        x <- getCurrentDay
+        x <- reArrangedCurrentDay
         return $ ToDoItem item (x) deadline description
 
 takeDay :: String -> Int
@@ -54,7 +55,9 @@ addItem = do
         description <- getLine
         todo <- createToDo ((takeDay filteredDate), (takeMonth filteredDate), (takeYear filteredDate)) item description
         jsonList <- getJSON
-        B.writeFile "data/items2.json" (encode (todo : fromJust jsonList))
+        case jsonList of 
+         Just _  -> B.writeFile "data/items2.json" (encode (todo : fromJust jsonList)) -- change to NOT use fromJust
+         Nothing -> error "can't read JSON"
         exitSuccess
 
 deleteItem = undefined
@@ -69,10 +72,20 @@ addDate = do
                         putStrLn "Your date must be in the form dd/mm/yyy"
                         addDate
 
-viewList :: IO()
+viewList :: IO() --can only view one item of ToDo
 viewList = do 
         list <- getJSON
-        print list
+        case list of
+         Just [ToDoItem {title, dateAdded, taskDeadLine, description}]
+                  -> do putStrLn "Title: "  
+                        putStrLn title
+                        putStrLn "Description: "
+                        putStrLn description
+                        putStrLn "Date added: " 
+                        print dateAdded
+                        putStrLn "To be completed by: " 
+                        print taskDeadLine
+         Nothing ->  error "failed to decode JSON"
 
 jsonFile :: FilePath
 jsonFile = "data/items.json"
@@ -81,4 +94,3 @@ getJSON :: IO (Maybe [ToDoItem])
 getJSON = do
         list <- decode <$> B.readFile jsonFile
         return (list :: Maybe [ToDoItem])
-        
