@@ -57,7 +57,7 @@ addItem = do
         todo <- createToDo ((takeDay filteredDate), (takeMonth filteredDate), (takeYear filteredDate)) item description
         jsonList <- getJSON
         case jsonList of 
-         Just _  -> B.writeFile "data/items.json" (encode (todo : fromJust jsonList)) -- change to NOT use fromJust
+         Just _  -> B.writeFile jsonFile (encode (todo : fromJust jsonList)) -- change to NOT use fromJust
          Nothing -> error "can't read JSON"
         exitSuccess
    
@@ -73,21 +73,27 @@ addDate = do
                         putStrLn "Your date must be in the form dd/mm/yyy"
                         addDate
 
-viewList :: IO() --can only view one item of ToDo
+viewList :: IO()
 viewList = do
         list <- getJSON
-        case fmap (head) list of
-                Just ToDoItem {title, dateAdded, taskDeadLine, description}
-                        -> do 
-                        putStrLn "Title: "
-                        putStrLn title
-                        putStrLn "Description: "
-                        putStrLn description
-                        putStrLn "Date added: "
-                        print dateAdded
-                        putStrLn "To be completed by: "
-                        print taskDeadLine
-                Nothing -> exitSuccess
+        go list 
+         where
+          go recursiveList 
+                | fmap length recursiveList == Just 0 = exitSuccess
+                | otherwise = case fmap (head) recursiveList of
+                                Just ToDoItem {title, dateAdded, taskDeadLine, description}
+                                        -> do 
+                                        putStrLn "Title: "
+                                        putStrLn title
+                                        putStrLn "Description: "
+                                        putStrLn description
+                                        putStrLn "Date added: "
+                                        print dateAdded
+                                        putStrLn "To be completed by: "
+                                        print taskDeadLine
+                                        putStrLn "--------------------"
+                                        go (fmap (tail) recursiveList)
+                                Nothing -> exitSuccess
 
 jsonFile :: FilePath
 jsonFile = "data/items.json"
