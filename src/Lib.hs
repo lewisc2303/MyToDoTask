@@ -23,7 +23,7 @@ data ToDoItem =
                 ,dateAdded :: (Int, Int, Integer)
                 ,taskDeadLine :: (Int, Int, Integer)
                 ,description :: [Char]
-                } deriving (Show, Generic, FromJSON, ToJSON)
+                } deriving (Show, Generic, FromJSON, ToJSON, Eq)
 
 currentDay :: IO (Integer,Int,Int) -- :: (year,month,day)
 currentDay = getCurrentTime >>= (return . toGregorian . utctDay)
@@ -56,12 +56,23 @@ addItem = do
         description <- getLine
         todo <- createToDo ((takeDay filteredDate), (takeMonth filteredDate), (takeYear filteredDate)) item description
         jsonList <- getJSON
-        case jsonList of 
+        case jsonList of        
          Just _  -> B.writeFile jsonFile (encode (todo : fromJust jsonList)) -- change to NOT use fromJust
-         Nothing -> error "can't read JSON"
+         Nothing -> B.writeFile jsonFile (encode [todo]) --to account for blank JSON 
         exitSuccess
-   
-deleteItem = undefined
+
+deleteItem :: IO()        
+deleteItem = do
+        list <- getJSON
+        putStrLn "Which task would you like to delete?"
+        option <- getLine
+        let optionInt = read option :: Int
+        let toDoItem = fromJust (selectItem list (Just optionInt))              --lots of work arounds, rewrite the code
+        B.writeFile jsonFile (encode (filter <$> (Just (\x -> x == toDoItem )) <*> list))
+        exitSuccess
+
+selectItem :: Maybe [ToDoItem] -> Maybe Int -> Maybe ToDoItem
+selectItem list option =  (!!) <$> list <*> option
 
 addDate :: IO String
 addDate = do
@@ -76,9 +87,8 @@ addDate = do
 viewList :: IO()
 viewList = do
         list <- getJSON
-        go list 
-         where
-          go recursiveList 
+        go list
+         where go recursiveList 
                 | fmap length recursiveList == Just 0 = exitSuccess
                 | otherwise = case fmap (head) recursiveList of
                                 Just ToDoItem {title, dateAdded, taskDeadLine, description}
