@@ -15,6 +15,7 @@ import Data.Aeson
 import Data.Aeson.Types
 import Data.Time.Clock
 import Data.Time.Calendar
+import qualified Data.ByteString as S
 import qualified Data.ByteString.Lazy as B
 
 data ToDoItem =
@@ -56,10 +57,10 @@ addItem = do
         todo <- createToDo ((takeDay filteredDate), (takeMonth filteredDate), (takeYear filteredDate)) item description
         jsonList <- getJSON
         case jsonList of 
-         Just _  -> B.writeFile "data/items2.json" (encode (todo : fromJust jsonList)) -- change to NOT use fromJust
+         Just _  -> B.writeFile "data/items.json" (encode (todo : fromJust jsonList)) -- change to NOT use fromJust
          Nothing -> error "can't read JSON"
         exitSuccess
-
+   
 deleteItem = undefined
 
 addDate :: IO String
@@ -73,17 +74,17 @@ addDate = do
                         addDate
 
 viewList :: IO() --can only view one item of ToDo
-viewList = do 
+viewList = do
         list <- getJSON
         case list of
          Just [ToDoItem {title, dateAdded, taskDeadLine, description}]
-                  -> do putStrLn "Title: "  
+                  -> do putStrLn "Title: "
                         putStrLn title
                         putStrLn "Description: "
                         putStrLn description
-                        putStrLn "Date added: " 
+                        putStrLn "Date added: "
                         print dateAdded
-                        putStrLn "To be completed by: " 
+                        putStrLn "To be completed by: "
                         print taskDeadLine
          Nothing ->  error "failed to decode JSON"
 
@@ -92,5 +93,5 @@ jsonFile = "data/items.json"
 
 getJSON :: IO (Maybe [ToDoItem])
 getJSON = do
-        list <- decode <$> B.readFile jsonFile
+        list <- decodeStrict <$> S.readFile jsonFile
         return (list :: Maybe [ToDoItem])
