@@ -76,9 +76,10 @@ addDate = do
 viewList :: IO() --can only view one item of ToDo
 viewList = do
         list <- getJSON
-        case list of
-         Just [ToDoItem {title, dateAdded, taskDeadLine, description}]
-                  -> do putStrLn "Title: "
+        case fmap (head) list of
+                Just ToDoItem {title, dateAdded, taskDeadLine, description}
+                        -> do 
+                        putStrLn "Title: "
                         putStrLn title
                         putStrLn "Description: "
                         putStrLn description
@@ -86,7 +87,7 @@ viewList = do
                         print dateAdded
                         putStrLn "To be completed by: "
                         print taskDeadLine
-         Nothing ->  error "failed to decode JSON"
+                Nothing -> exitSuccess
 
 jsonFile :: FilePath
 jsonFile = "data/items.json"
