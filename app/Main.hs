@@ -13,4 +13,3 @@ main = forever $ do
                 "d" -> deleteItem
                 "v" -> viewList
                 _   -> putStrLn "Your must enter either 'a', 'd' or 'v'" 
-                
